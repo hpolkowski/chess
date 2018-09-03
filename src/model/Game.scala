@@ -12,18 +12,7 @@ package model
 case class Game (
    board: Board,
    pieces: List[GamePiece]
- ) {
-
-  /**
-    * Solves the game, returns all found possibilities
-    * @return list of solved games
-    */
-  def solve: List[SolvedGame] = {
-    val solvedGame = SolvedGame.init(this)
-
-    List(solvedGame)
-  }
-}
+ )
 
 object Game {
 
