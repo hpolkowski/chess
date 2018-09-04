@@ -3,34 +3,34 @@ package model
 /**
   * Created by jAANUSZEK0700 on 02.09.2018.
   */
+import GamePieceType._
 
 /**
   * Contains solved game representation
+  * @param game   game to solve object
   * @param result representation of solved chess board
   */
-import GamePieceType._
-
 case class SolvedGame (
-  var result: Array[Array[String]]
+  game: Game,
+  result: Array[Array[String]]
 ) {
 
   /**
-    * Number of board columns
-    */
-  private val resultColumnCount: Int = result.headOption.map(_.length).getOrElse(0)
-
-  /**
     * Inserts given type of chess piece into selected place on board
-    * @param n      row number
-    * @param m      column number
+    * @param row      row number
+    * @param column      column number
     * @param piece  chess piece
     * @param preserveMovement if true places a dot in every spot that piece can move
     * @return true if success otherwise false
     */
-  def insert(n: Int, m: Int, piece: GamePiece, preserveMovement: Boolean = true): Boolean =
-  //TODO: Check if ne piece do not interfere with old pieces, can use method from TODO below
-    if(result(n)(m) == " ") {
-      result(n)(m) = piece.pieceType match {
+  def insert(row: Int, column: Int, piece: GamePiece, preserveMovement: Boolean = true): Boolean = {
+    val noThreat = piece.allMovementOptions(row, column, game).forall { case (n, m) =>
+      val field = result(n)(m)
+      field == " " || field == "."
+    }
+
+    if(result(row)(column) == " " && noThreat) {
+      result(row)(column) = piece.pieceType match {
         case KING => "K"
         case QUEEN => "Q"
         case BISHOP => "B"
@@ -40,50 +40,13 @@ case class SolvedGame (
       }
 
       if(preserveMovement)
-        preservePieceMovement(n, m, piece)
+        piece.allMovementOptions(row, column, game).foreach { case (n, m) =>
+          setDotIfPossible(n,m)
+        }
 
       true
     } else
       false
-
-  /**
-    * Sets dots in every place on boart that piece can move to preserve form being taken by other piece
-    * @param n      row number
-    * @param m      column number
-    * @param piece  chess piece
-    */
-  private def preservePieceMovement(n: Int, m: Int, piece: GamePiece): Unit = {
-    //TODO: Replace this code into GamePiece, return array with all coordinates to fill
-    piece.pieceType match {
-
-      case KING =>
-        setDotIfPossible(n - 1, m - 1)
-        setDotIfPossible(n - 1, m)
-        setDotIfPossible(n - 1, m + 1)
-        setDotIfPossible(n, m - 1)
-        setDotIfPossible(n, m + 1)
-        setDotIfPossible(n + 1, m - 1)
-        setDotIfPossible(n + 1, m)
-        setDotIfPossible(n + 1, m + 1)
-
-      case QUEEN =>
-
-      case BISHOP =>
-
-      case ROOK =>
-
-      case KNIGHT =>
-        setDotIfPossible(n - 2, m - 1)
-        setDotIfPossible(n - 2, m + 1)
-        setDotIfPossible(n - 1, m - 2)
-        setDotIfPossible(n - 1, m + 2)
-        setDotIfPossible(n + 1, m - 2)
-        setDotIfPossible(n + 1, m + 2)
-        setDotIfPossible(n + 2, m - 1)
-        setDotIfPossible(n + 2, m + 1)
-
-      case _ =>
-    }
   }
 
   /**
@@ -109,7 +72,7 @@ case class SolvedGame (
     * Adds column description to board visual representation
     * @return string with column descriptors
     */
-  private def boardColumnDescription: String = (1 to resultColumnCount).map { i =>
+  private def boardColumnDescription: String = (1 to game.board.columns).map { i =>
     String.format("%3s", intToBase26String(i))
   }.mkString("   |", "|", "|\n").replaceAll("`", " ")
 
@@ -136,7 +99,7 @@ case class SolvedGame (
     * Adds separation line to board
     * @return string with separation line
     */
-  private def boardSeparator: String = s"---${"+---" * resultColumnCount}+\n"
+  private def boardSeparator: String = s"---${"+---" * game.board.columns}+\n"
 }
 
 object SolvedGame {
@@ -147,9 +110,9 @@ object SolvedGame {
     * @param game game to solve object
     * @return empty object of SolvedGame
     */
-  def init(game: Game): SolvedGame = SolvedGame (
-    (0 until game.board.n).toArray.map { n =>
-      (0 until game.board.m).toArray.map { m =>
+  def init(game: Game): SolvedGame = SolvedGame (game,
+    (0 until game.board.rows).toArray.map { n =>
+      (0 until game.board.columns).toArray.map { m =>
         " "
       }
     }

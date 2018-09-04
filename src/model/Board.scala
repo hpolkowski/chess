@@ -7,12 +7,12 @@ import utils.InputUtils.readInt
 
 /**
   * Chess board
-  * @param n number of rows
-  * @param m number of columns
+  * @param rows     number of rows
+  * @param columns  number of columns
   */
 case class Board (
-  var n: Int,
-  var m: Int
+   var rows: Int,
+   var columns: Int
 )
 
 object Board {
@@ -21,8 +21,8 @@ object Board {
     * Initializes game board dimensions
     */
   def init: Board = {
-    val n = readInt("Enter number of board rows: ")
-    val m = readInt("Enter number of board columns: ")
-    Board(n, m)
+    val rows = readInt("Enter number of board rows: ")
+    val columns = readInt("Enter number of board columns: ")
+    Board(rows, columns)
   }
 }
