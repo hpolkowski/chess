@@ -14,12 +14,10 @@ object GameSolver {
     * @return list of solved games
     */
   def solve(game: Game): List[SolvedGame] = {
-    val pieces = game.pieces.reverse
-
     (0 until (game.board.rows * game.board.columns / 2D).round.toInt).flatMap { i =>
       val solvedGame = SolvedGame.init(game)
 
-      val success = pieces.forall { gamePiece =>
+      val success = game.pieces.forall { gamePiece =>
         insertInFirstFreeSpot(i, solvedGame, gamePiece)
       }
 
