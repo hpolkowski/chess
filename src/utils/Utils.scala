@@ -1,5 +1,7 @@
 package utils
 
+import java.beans.Introspector
+
 /**
   * Created by jAANUSZEK0700 on 02.09.2018.
   */
@@ -12,7 +14,10 @@ object InputUtils {
     */
   def readInt(prompt: String): Int = {
     printf(prompt)
-    scala.io.StdIn.readInt()
+    try scala.io.StdIn.readInt() catch { case e: Exception =>
+      println(s"Error ${Introspector.decapitalize(e.getMessage)}")
+      readInt(prompt)
+    }
   }
 }
 
