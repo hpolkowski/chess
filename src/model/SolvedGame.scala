@@ -16,6 +16,12 @@ case class SolvedGame (
 ) {
 
   /**
+    * Makes simple string from result, it helps in distinct
+    * @return simple result string
+    */
+  def toSimpleString: String = result.map(_.mkString("")).mkString("")
+
+  /**
     * Inserts given type of chess piece into selected place on board
     * @param row      row number
     * @param column      column number
@@ -48,6 +54,37 @@ case class SolvedGame (
     } else
       false
   }
+
+  /**
+    * Transposes game result if board is square
+    * @return optional solved game with transposed result
+    */
+  def transposeResult: Option[SolvedGame] = if(game.board.columns == game.board.rows)
+    Some(this.copy(result = result.transpose))
+  else
+    None
+
+  /**
+    * Rotates game result 90d clockwise if board is square
+    * @return optional solved game with rotated result
+    */
+  def rotateResult90: Option[SolvedGame] = this.transposeResult.map { transposed =>
+    transposed.copy(result = transposed.result.map(_.reverse))
+  }
+
+  /**
+    * Rotates game result 90d counterclockwise if board is square
+    * @return optional solved game with rotated result
+    */
+  def rotateResult90Counterclockwise: Option[SolvedGame] = this.transposeResult.map { transposed =>
+    transposed.copy(result = transposed.result.reverse)
+  }
+
+  /**
+    * Rotates game result 180d
+    * @return solved game with rotated result
+    */
+  def rotateResult180: SolvedGame = this.copy(result = result.reverse.map(_.reverse))
 
   /**
     * Sets dot in solved game array if possible

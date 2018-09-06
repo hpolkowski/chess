@@ -16,16 +16,27 @@ object GameSolver {
   def solve(game: Game): List[SolvedGame] = {
     val pieces = game.pieces.reverse
 
-    (0 until (game.board.rows * game.board.columns / 2D).round.toInt).toList.flatMap { i =>
+    (0 until (game.board.rows * game.board.columns / 2D).round.toInt).flatMap { i =>
       val solvedGame = SolvedGame.init(game)
 
       val success = pieces.forall { gamePiece =>
         insertInFirstFreeSpot(i, solvedGame, gamePiece)
       }
 
-      if(success) Some(solvedGame) else None
-    }
-    //TODO: Add board rotation function, because every solution can be shown in four options
+      if(success)
+        List(
+          Some(solvedGame),
+          solvedGame.transposeResult,
+          solvedGame.rotateResult90,
+          solvedGame.rotateResult90.flatMap(_.transposeResult),
+          Some(solvedGame.rotateResult180),
+          solvedGame.rotateResult180.transposeResult,
+          solvedGame.rotateResult90Counterclockwise,
+          solvedGame.rotateResult90Counterclockwise.flatMap(_.transposeResult)
+        ).flatten
+      else
+        List()
+    }.groupBy(_.toSimpleString).flatMap(_._2.headOption).toList
   }
 
   /**
