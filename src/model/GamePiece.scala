@@ -110,7 +110,7 @@ object GamePiece {
     * @return list of game pieces
     */
   def init(pieceType: GamePieceType): List[GamePiece] = {
-    (1 to readInt(s"Enter number of ${pieceType.toString.toLowerCase}s: ")).map { i: Int =>
+    (1 to readInt(s"Enter number of ${pieceType.toString.toLowerCase}s: ", min = 0)).map { i: Int =>
       GamePiece(pieceType)
     }.toList
   }
